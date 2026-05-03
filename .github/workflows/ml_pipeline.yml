@@ -20,15 +20,16 @@ jobs:
     # --- ĐẶT DVC Ở ĐÂY ---
     - name: Install DVC
       run: |
-        pip install "dvc[gdrive]" 
-        # Thay [gdrive] bằng [s3], [azure]... tùy loại storage bạn dùng
+        pip install "dvc[http]"
 
     - name: Pull data from DVC
       env:
-        # Secret này chứa thông tin xác thực để vào Google Drive/S3
-        GDRIVE_CREDENTIALS_DATA: ${{ secrets.DVC_REMOTE_CONFIG }} 
+        DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+        DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
       run: |
-        # Cấu hình remote nếu cần (tùy thuộc vào cách bạn setup DVC)
+        dvc remote modify origin --local auth basic
+        dvc remote modify origin --local user $DAGSHUB_USERNAME
+        dvc remote modify origin --local password $DAGSHUB_TOKEN
         dvc pull
     # ----------------------
 
