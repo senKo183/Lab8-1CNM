@@ -1,0 +1,6 @@
+{
+    "data_path": "LengthOfStay.csv",
+    "model_path": "./model",
+    "max_models": 10,
+    "runtime": 60
+}
