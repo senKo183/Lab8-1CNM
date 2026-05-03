@@ -9,12 +9,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: 3.11
+
+    # --- ĐẶT DVC Ở ĐÂY ---
+    - name: Install DVC
+      run: |
+        pip install "dvc[gdrive]" 
+        # Thay [gdrive] bằng [s3], [azure]... tùy loại storage bạn dùng
+
+    - name: Pull data from DVC
+      env:
+        # Secret này chứa thông tin xác thực để vào Google Drive/S3
+        GDRIVE_CREDENTIALS_DATA: ${{ secrets.DVC_REMOTE_CONFIG }} 
+      run: |
+        # Cấu hình remote nếu cần (tùy thuộc vào cách bạn setup DVC)
+        dvc pull
+    # ----------------------
 
     - name: Install dependencies
       run: pip install -r requirements.txt
@@ -23,15 +39,13 @@ jobs:
       run: python automl_pipeline.py
 
     - name: Build Docker
-      run: |
-        docker build -t automl .
+      run: docker build -t automl .
 
     - name: Test Docker
-      run: |
-        docker run automl
+      run: docker run automl
+
     - name: Test Model
-      run: |
-        python test_model.py
+      run: python test_model.py
     
     - name: Login Docker
       run: |
